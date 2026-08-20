@@ -38,7 +38,7 @@ def train_crop_model():
     print(f"Model Training Complete! Accuracy: {acc * 100:.2f}%")
     
     # Save the trained model to ml/model.pkl
-    model_output_path = os.path.join("ml", "model.pkl")
+    model_output_path = os.path.join( "model.pkl")
     if not os.path.exists("ml"):
         model_output_path = "model.pkl"
         
