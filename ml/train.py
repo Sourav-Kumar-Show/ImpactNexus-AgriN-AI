@@ -7,10 +7,10 @@ from sklearn.metrics import accuracy_score
 
 def train_crop_model():
     # Update 'crop_recommendation.csv' to match your actual dataset filename
-    data_path = os.path.join("data", "processed", "crop_recommendation.csv")
+    data_path = os.path.join("data", "crop_recommendation.csv")
     
     if not os.path.exists(data_path):
-        data_path = os.path.join("..", "data", "processed", "crop_recommendation.csv")
+        data_path = os.path.join("..", "data", "crop_recommendation.csv")
 
     print(f"Loading dataset from: {data_path}")
     df = pd.read_csv(data_path)
@@ -21,8 +21,8 @@ def train_crop_model():
         print("Dropped 'Unnamed: 0' column successfully.")
     
     # Define features and target (adjust column names if your dataset differs slightly)
-    X = df[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
-    y = df['label']
+    X = df[['N', 'P', 'K', 'temperature', 'pH', 'rainfall']]
+    y = df['Crop']
     
     # Train/Test Split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
