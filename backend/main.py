@@ -58,8 +58,7 @@ async def predict_crop(file: UploadFile = File(...)):
         # 2. Extract soil properties & location using Gemini OCR
         soil_data = extract_soil_data_from_image(image_bytes)
         
-        # Default coordinates (e.g., regional baseline or extracted if available)
-        # Using default baseline coordinates for weather API integration
+        # Default baseline coordinates for weather API integration
         lat, lon = 17.3850, 78.4867 
         
         # 3. Fetch live weather (temperature & rainfall) from Open-Meteo API
@@ -90,8 +89,10 @@ async def predict_crop(file: UploadFile = File(...)):
             for i in top_indices
         ]
         
-        # 6. Generate Gemini Agronomic Recommendation & Analysis
-        client = genai.Client()
+        # 6. Generate Gemini Agronomic Recommendation & Analysis with explicit API key handling
+        api_key = os.environ.get("AQ.Ab8RN6KqR8SqLBPw3ZyNnfVbmies1dYf-sT3IkrcU7hEZYMp3w")
+        client = genai.Client(api_key=api_key) if api_key else genai.Client()
+        
         prompt = (
             f"Given the following agricultural parameters:\n"
             f"- Nitrogen (N): {soil_data['N']}\n"
