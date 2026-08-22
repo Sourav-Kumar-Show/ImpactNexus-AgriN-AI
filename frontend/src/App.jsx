@@ -1,122 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import {useEffect,useRef,useState} from 'react'
+import {NavLink,Navigate,Route,Routes,useNavigate} from 'react-router-dom'
+import {Activity,Bell,Bot,BrainCircuit,Camera,CheckCircle2,ChevronRight,CloudRain,Database,Droplets,Globe2,Leaf,MapPin,Menu,Network,Satellite,ShieldCheck,Sprout,Sun,Thermometer,Upload,Wind,X} from 'lucide-react'
+import {Area,AreaChart,Bar,BarChart,CartesianGrid,ResponsiveContainer,Tooltip,XAxis,YAxis} from 'recharts'
+import {api} from './services/api'
 import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+const farmId='farm-001'
+const intelFallback={ndvi:.72,evi:.48,savi:.61,ndmi:.30,cloud_cover:12,temperature:29.4,humidity:67,rainfall:4.2,wind:11,soil_moisture:34,ph:6.7,organic_carbon:.72,soil_health_score:78,npk:'Medium N · High P · Medium K',forecast:'Light rain expected in the next 24 hours.'}
+const adviceFallback={farm_health:78,disease_risk:'Medium',water_stress:'Moderate',heat_stress:'Low',yield_risk:'Low',recommendation:'Irrigate early morning for 25 minutes within the next 48 hours.',reason:'Soil moisture is adequate today, but forecast conditions may increase water demand.',priority:'High',recommendations:[{category:'Irrigation',text:'Irrigate early morning for 25 minutes within the next 48 hours.',priority:'High'},{category:'Crop monitoring',text:'Inspect lower leaves for early blight symptoms.',priority:'Medium'}]}
+const modelFallback=[['India','Tomato','CropGuard Vision','v1.4','Active'],['Brazil','Soybean','SafraSense','v2.1','Active'],['China','Rice','PaddyAI','v1.8','Prototype'],['Russia','Wheat','TerraYield','v1.2','Active'],['South Africa','Maize','FieldSignal','v0.9','Prototype']]
+const get=(o,keys,fb)=>{for(const k of keys)if(o?.[k]!==undefined)return o[k];return fb}
+function useApi(load,fallback){const[s,setS]=useState({data:fallback,loading:true,offline:false});const retry=()=>{setS(x=>({...x,loading:true}));load().then(data=>setS({data:data||fallback,loading:false,offline:false})).catch(()=>setS({data:fallback,loading:false,offline:true}))};useEffect(()=>{retry()},[]);return{...s,retry}}
+const nav=[['/dashboard','Dashboard',Activity],['/intelligence','Farm Intelligence',Satellite],['/advisory','AI Advisory',BrainCircuit],['/doctor','Crop Doctor',Camera],['/brics','BRICS Network',Globe2]]
+function Logo(){return <div className="brand"><b><Leaf size={20}/></b><div><strong>AgriNexus</strong><small>AI Agriculture Intelligence</small></div></div>}
+function Sidebar({open,close,offline}){return <aside className={`sidebar ${open?'open':''}`}><Logo/><button className="mobile-close" onClick={close}><X/></button><nav>{nav.map(([to,label,Icon])=><NavLink to={to} onClick={close} key={to}><Icon size={19}/>{label}</NavLink>)}</nav><div className={`connection ${offline?'offline':''}`}><i/><div><small>AgriNexus API</small><strong>{offline?'Offline · demo data':'Connected'}</strong></div></div></aside>}
+function Topbar({menu,offline}){return <header className="topbar"><button className="menu-btn" onClick={menu}><Menu/></button><div className="farm-select"><Sprout size={17}/>Green Valley Farm<ChevronRight size={16}/></div><div className="top-meta"><span><MapPin size={15}/> Nashik, Maharashtra</span><b>Tomato</b></div><div className="top-actions"><span className={`api-pill ${offline?'offline':''}`}><i/>{offline?'Offline':'Live'}</span><button><Bell size={19}/></button><div className="avatar">FM</div></div></header>}
+function PageHeader({title,subtitle,children}){return <div className="page-header"><div><p className="eyebrow">AGRICULTURAL INTELLIGENCE</p><h1>{title}</h1><p>{subtitle}</p></div>{children}</div>}
+function Card({children,className=''}){return <section className={`card ${className}`}>{children}</section>}
+function Risk({value}){return <span className={`risk ${String(value).toLowerCase()}`}>{value}</span>}
+function Progress({value,tone='green'}){return <div className="progress"><span className={tone} style={{width:`${Math.min(value,100)}%`}}/></div>}
+function Offline({offline,retry}){return offline?<div className="offline-note">Unable to connect to AgriNexus API. Showing prototype data.<button onClick={retry}>Retry</button></div>:null}
+function Heading({title,caption}){return <div className="card-heading"><div><h3>{title}</h3><p>{caption}</p></div><button className="more">•••</button></div>}
+function Dashboard({intel,advice}){const i=intel.data,a=advice.data,navigate=useNavigate(),ndvi=get(i,['ndvi'],.72),moist=get(i,['soil_moisture'],34),temp=get(i,['temperature'],29.4),health=get(a,['farm_health'],78),disease=get(a,['disease_risk'],'Medium');const trend=[['Mon',.62],['Tue',.65],['Wed',.63],['Thu',.68],['Fri',.67],['Sat',.71],['Today',.72]].map(([day,value])=>({day,value}));const weather=[['Mon',28],['Tue',30],['Wed',27],['Thu',29],['Fri',31],['Sat',28],['Sun',27]].map(([day,value])=>({day,value}));return <><PageHeader title="Good morning, Farmer" subtitle="Here is today's intelligence for your farm."><div className="updated"><CheckCircle2 size={16}/>Last updated just now<span>Nashik, Maharashtra · Tomato · Farm {farmId}</span></div></PageHeader><Offline {...advice}/><div className="metrics"><Card className="health metric"><div><p>Farm Health</p><h2>{health}<small>/100</small></h2><Risk value="Good"/></div><div className="ring"><span>{health}%</span></div></Card><Metric icon={<Leaf/>} kind="leaf" label="NDVI" value={Number(ndvi).toFixed(2)} foot="↗ 4.8% this week"/><Card className="metric"><div className="metric-icon water"><Droplets/></div><p>Soil Moisture</p><h2>{moist}%</h2><Progress value={moist}/><span className="metric-foot">Optimal range</span></Card><Metric icon={<Sun/>} kind="sun" label="Temperature" value={`${temp}°C`} foot="Current conditions"/><Card className="metric"><div className="metric-icon disease"><Activity/></div><p>Disease Risk</p><h2><Risk value={disease}/></h2><span className="metric-foot">Monitor closely</span></Card></div><Card className="recommendation"><div className="ai-orb"><Bot/></div><div className="rec-copy"><span className="rec-label">AI RECOMMENDATION <Risk value={get(a,['priority'],'High')}/></span><h2>{get(a,['recommendation'],adviceFallback.recommendation)}</h2><p>{get(a,['reason'],adviceFallback.reason)}</p></div><button className="primary" onClick={()=>navigate('/advisory')}>View Full Advisory <ChevronRight size={17}/></button></Card><div className="two-col"><Card className="chart-card"><Heading title="NDVI Trend" caption="Prototype satellite visualization"/><ResponsiveContainer width="100%" height={220}><AreaChart data={trend}><defs><linearGradient id="ndvi" x1="0" x2="0" y1="0" y2="1"><stop stopColor="#237a4b" stopOpacity=".3"/><stop offset="1" stopColor="#237a4b" stopOpacity="0"/></linearGradient></defs><CartesianGrid vertical={false} stroke="#e8eee9"/><XAxis dataKey="day" axisLine={false} tickLine={false}/><YAxis domain={[.5,.8]} axisLine={false} tickLine={false}/><Tooltip/><Area type="monotone" dataKey="value" stroke="#237a4b" strokeWidth={3} fill="url(#ndvi)"/></AreaChart></ResponsiveContainer></Card><Card className="chart-card"><Heading title="Weather Outlook" caption="7-day temperature forecast · prototype"/><ResponsiveContainer width="100%" height={220}><BarChart data={weather}><CartesianGrid vertical={false} stroke="#e8eee9"/><XAxis dataKey="day" axisLine={false} tickLine={false}/><YAxis hide/><Tooltip/><Bar dataKey="value" fill="#9fcb52" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer></Card></div><div className="section-label"><h2>Quick insights</h2><span>Powered by AgriNexus AI</span></div><div className="insights"><Insight icon={<Leaf/>} title="Vegetation" text="Healthy crop activity detected across the field."/><Insight icon={<Database/>} title="Soil" text="Moisture is currently within the optimal range."/><Insight icon={<Activity/>} title="Disease" text="Monitor leaves for early blight."/></div></>}
+function Metric({icon,kind,label,value,foot}){return <Card className="metric"><div className={`metric-icon ${kind}`}>{icon}</div><p>{label}</p><h2>{value}</h2><span className="metric-foot">{foot}</span></Card>};function Insight({icon,title,text}){return <Card className="insight"><span>{icon}</span><div><h3>{title}</h3><p>{text}</p></div><ChevronRight size={18}/></Card>}
+function Mini({icon,label,value}){return <div className="mini">{icon&&<span>{icon}</span>}<div><small>{label}</small><strong>{value}</strong></div></div>}
+function Intelligence({intel}){const i=intel.data,vals=[['NDVI',get(i,['ndvi'],.72),'Vegetation density'],['EVI',get(i,['evi'],.48),'Canopy vigor'],['SAVI',get(i,['savi'],.61),'Soil-adjusted'],['NDMI',get(i,['ndmi'],.30),'Plant moisture'],['Cloud Cover',`${get(i,['cloud_cover'],12)}%`,'Satellite quality']];return <><PageHeader title="Farm Intelligence" subtitle="Explore satellite, weather and soil conditions behind your farm’s AI analysis."/><Offline {...intel}/><Card className="farm-map"><div className="map-copy"><p className="eyebrow">FARM LOCATION</p><h2>Green Valley Farm</h2><p>Nashik, Maharashtra, India</p><div>Farm ID <strong>{farmId}</strong> · Crop <strong>Tomato</strong></div></div><div className="map-visual"><div className="farm-polygon"><Leaf size={30}/><strong>Farm boundary</strong><small>24.6 hectares</small></div><span className="map-label">Nashik</span></div></Card><div className="section-label"><div><p className="eyebrow">EARTH OBSERVATION</p><h2>Satellite Intelligence</h2></div><span className="source-live"><i/> Latest pass · 2h ago</span></div><div className="satellite-grid">{vals.map(([n,v,d])=><Card className="satellite-metric" key={n}><p>{n}</p><h2>{typeof v==='number'?v.toFixed(2):v}</h2><span>{d}</span></Card>)}</div><Card className="interpret"><Leaf/><div><strong>Vegetation health interpretation</strong><p>Vegetation indicators suggest generally healthy crop activity.</p></div></Card><div className="two-col"><Card><Heading title="Weather Intelligence" caption="Local field conditions"/><div className="weather-grid"><Mini icon={<Thermometer/>} label="Temperature" value={`${get(i,['temperature'],29.4)}°C`}/><Mini icon={<Droplets/>} label="Humidity" value={`${get(i,['humidity'],67)}%`}/><Mini icon={<CloudRain/>} label="Rainfall" value={`${get(i,['rainfall'],4.2)} mm`}/><Mini icon={<Wind/>} label="Wind" value={`${get(i,['wind'],11)} km/h`}/></div><div className="forecast"><CloudRain/> {get(i,['forecast'],intelFallback.forecast)}</div></Card><Card><Heading title="Soil Health" caption="Latest soil intelligence"/><div className="soil-layout"><div className="ring soil-ring"><span>{get(i,['soil_health_score'],78)}<small>/100</small></span></div><div><Mini label="pH" value={get(i,['ph'],6.7)}/><Mini label="Organic Carbon" value={`${get(i,['organic_carbon'],.72)}%`}/><Mini label="Soil Moisture" value={`${get(i,['soil_moisture'],34)}%`}/></div></div><p className="npk"><strong>NPK</strong> {get(i,['npk'],intelFallback.npk)}</p></Card></div><Card className="data-sources"><div><Database/><div><h3>Data sources</h3><p>Verified inputs supporting your farm analysis</p></div></div><span><i/> Satellite</span><span><i/> Weather</span><span><i/> Soil</span></Card></>}
+function Advisory({advice}){const a=advice.data,navigate=useNavigate(),risks=[['Water Stress',get(a,['water_stress'],'Moderate'),Droplets],['Heat Stress',get(a,['heat_stress'],'Low'),Sun],['Disease Risk',get(a,['disease_risk'],'Medium'),Activity],['Yield Risk',get(a,['yield_risk'],'Low'),Sprout]],recs=get(a,['recommendations'],adviceFallback.recommendations),feats=[['NDVI',34],['Soil Moisture',29],['Rainfall',21],['Temperature',16]];return <><PageHeader title="AI Advisory" subtitle="AI-generated farm risks and recommended actions."/><Offline {...advice}/><div className="risk-grid">{risks.map(([l,v,I])=><Card className="risk-card" key={l}><span><I/></span><p>{l}</p><h2><Risk value={v}/></h2><small>{v==='Low'?'Stable conditions':'Attention recommended'}</small></Card>)}</div><div className="section-label"><div><p className="eyebrow">ACTION CENTER</p><h2>Recommended Actions</h2></div><span>{recs.length} active recommendations</span></div><div className="advice-list">{recs.map((r,n)=><Card className="advice" key={n}><span className="advice-number">0{n+1}</span><div><span className="rec-label">{get(r,['category'],'Farm action')} <Risk value={get(r,['priority'],'Medium')}/></span><h3>{get(r,['text','recommendation'],String(r))}</h3><p>Based on current farm intelligence and local forecast signals.</p></div><button className="outline">Mark reviewed</button></Card>)}</div><div className="two-col"><Card><Heading title="Why is the AI predicting this?" caption="Factors with the strongest influence on the current advisory."/><div className="importance">{feats.map(([n,v])=><div key={n}><span>{n}</span><Progress value={v} tone="lime"/><strong>{v}%</strong></div>)}</div></Card><Card className="pipeline"><h3>Decision pipeline</h3><div className="pipeline-row"><span>Satellite</span><b>+</b><span>Weather</span><b>+</b><span>Soil</span><b>+</b><span>Crop</span></div><div className="pipeline-flow"><span>Feature Analysis</span><ChevronRight/><span>Risk Prediction</span><ChevronRight/><span>Decision Engine</span><ChevronRight/><strong>Farmer Advisory</strong></div></Card></div><Card className="doctor-cta"><div className="ai-orb"><Camera/></div><div><h2>See something unusual in your crop?</h2><p>Upload a leaf photo for an AI-assisted disease check.</p></div><button className="primary" onClick={()=>navigate('/doctor')}>Go to Crop Doctor <ChevronRight size={17}/></button></Card></>}
+function CropDoctor(){const[file,setFile]=useState(null),[preview,setPreview]=useState(null),[loading,setLoading]=useState(false),[result,setResult]=useState(null),[toast,setToast]=useState(''),input=useRef();const choose=f=>{if(f){setFile(f);setPreview(URL.createObjectURL(f));setResult(null)}};const analyze=async()=>{setLoading(true);try{setResult(await api.analyzeCropDoctor(file));setToast('Analysis complete — diagnosis is ready.')}catch{setResult({disease:'Early blight',confidence:91,severity:'Moderate',symptoms:['Dark concentric spots','Yellowing lower leaves'],next_action:'Remove severely affected leaves and consult local guidance before treatment.'});setToast('Demo diagnosis shown because the API is unavailable.')}setLoading(false)};const d=result&&{disease:get(result,['disease','diagnosis'],'Early blight'),confidence:get(result,['confidence'],91),severity:get(result,['severity'],'Moderate'),symptoms:get(result,['symptoms'],['Dark concentric spots','Yellowing lower leaves']),action:get(result,['next_action','recommendation'],'Remove severely affected leaves and consult local guidance before treatment.')};return <><PageHeader title="Crop Doctor" subtitle="Upload a crop leaf image to identify potential disease."/>{toast&&<div className="toast"><CheckCircle2/>{toast}</div>}<div className="doctor-grid"><Card className="upload-card"><Heading title="Leaf image analysis" caption="Clear, well-lit photos produce the best results."/>{!preview?<button className="dropzone" onClick={()=>input.current.click()}><span><Upload size={34}/></span><h2>Upload a leaf image</h2><p>Drag and drop your image here, or browse your files</p><small>PNG, JPG or JPEG · Max 10 MB</small><b>Choose Image</b></button>:<div className="preview"><img src={preview} alt="Selected crop leaf"/><div><strong>{file.name}</strong><p>{(file.size/1048576).toFixed(2)} MB · Ready for analysis</p><button className="text-btn" onClick={()=>{setFile(null);setPreview(null);setResult(null)}}>Remove image</button></div></div>}<input ref={input} type="file" accept="image/png,image/jpeg" onChange={e=>choose(e.target.files[0])}/>{preview&&<button className="primary analyze" onClick={analyze} disabled={loading}>{loading?'Analyzing crop image...':'Analyze Image'}</button>}</Card><Card className="doctor-side"><Bot/><h3>AI-assisted crop care</h3><p>Our prototype evaluates visual symptoms to help you decide what to inspect next.</p><div><CheckCircle2/> Disease pattern recognition</div><div><CheckCircle2/> Confidence-based results</div><div><CheckCircle2/> Actionable guidance</div></Card></div>{d?<Card className="diagnosis"><div className="diagnosis-title"><span className="disease-icon"><Activity/></span><div><p className="eyebrow">DIAGNOSIS RESULT</p><h2>{d.disease}</h2><Risk value={d.severity}/></div></div><div className="confidence"><div className="ring"><span>{d.confidence}%<small>confidence</small></span></div></div><div className="symptoms"><h3>Detected symptoms</h3><ul>{d.symptoms.map(x=><li key={x}><CheckCircle2/>{x}</li>)}</ul></div><div className="next-action"><h3>Next action</h3><p>{d.action}</p><button className="outline" onClick={()=>{setFile(null);setPreview(null);setResult(null)}}>Analyze Another Image</button></div></Card>:<Card className="empty-doctor"><Leaf/><h2>Ready when you are</h2><p>Select a clear image of the affected leaf to begin an AI-assisted inspection.</p></Card>}</>}
+function Brics({models,schema}){const rows=Array.isArray(models.data)?models.data:get(models.data,['models'],modelFallback),fields=Array.isArray(schema.data)?schema.data:get(schema.data,['fields'],['farm_id','location','crop','sowing_date','soil_type','satellite','weather','soil','advisory']);return <><PageHeader title="BRICS Agriculture Network" subtitle="Interoperable agricultural intelligence while keeping farmer-level data local."/><Offline {...models}/><Card className="network-card"><div className="network-copy"><p className="eyebrow">PROTOTYPE VISUALIZATION</p><h2>A network for shared agricultural progress.</h2><p>Local models remain local. Anonymised intelligence travels through a common interoperability layer.</p></div><div className="network-map"><div className="hub"><Network/><span>AgriNexus<br/>Interoperability Layer</span></div>{['India','Brazil','China','Russia','South Africa'].map((c,n)=><div className={`country country-${n}`} key={c}><i/>{c}</div>)}</div></Card><div className="section-label"><div><p className="eyebrow">COUNTRY MODEL REGISTRY</p><h2>Cross-border model registry</h2></div><span className="source-live"><i/>{rows.length} registered models</span></div><Card className="table-card"><div className="table-wrap"><table><thead><tr>{['Country','Crop','Model','Version','Status'].map(x=><th key={x}>{x}</th>)}</tr></thead><tbody>{rows.map((row,n)=>{const r=Array.isArray(row)?row:[row.country,row.crop,row.model,row.version,row.status];return <tr key={n}>{r.map((x,k)=><td key={k}>{k===4?<Risk value={x}/>:x}</td>)}</tr>})}</tbody></table></div></Card><div className="two-col"><Card className="schema"><Heading title="BRICS-AGRI-SCHEMA" caption="Interoperability standard"/><div className="schema-version"><span>Schema</span><strong>BRICS-AGRI-SCHEMA</strong><span>Version</span><strong>{get(schema.data,['version'],'0.1')}</strong></div><div className="field-list">{fields.map(f=><code key={typeof f==='string'?f:f.name}>{typeof f==='string'?f:f.name}</code>)}</div></Card><Card className="sovereignty"><Heading title="Data Sovereignty" caption="Farmer first"/><div className="sovereignty-flow"><span>Local farm data</span><ChevronRight/><span>Local processing</span><ChevronRight/><strong>Anonymised insights</strong><ChevronRight/><span>BRICS layer</span></div><label><input type="checkbox" defaultChecked/> Share anonymised agricultural insights</label><label><input type="checkbox"/> Share raw farm data <small>Not recommended</small></label><p className="local-note"><ShieldCheck/>Farmer-level raw data remains local.</p></Card></div></>}
+function App(){const[open,setOpen]=useState(false),farm=useApi(()=>api.getFarm(farmId),{}),intel=useApi(()=>api.getFarmIntelligence(farmId),intelFallback),advice=useApi(()=>api.getFarmAdvisory(farmId),adviceFallback),models=useApi(api.getBricsModels,modelFallback),schema=useApi(api.getBricsSchema,{fields:['farm_id','location','crop','sowing_date','soil_type','satellite','weather','soil','advisory'],version:'0.1'}),offline=farm.offline||intel.offline||advice.offline;return <div className="app-shell"><Sidebar open={open} close={()=>setOpen(false)} offline={offline}/>{open&&<button className="scrim" onClick={()=>setOpen(false)}/>}<main><Topbar menu={()=>setOpen(true)} offline={offline}/><div className="content"><Routes><Route path="/dashboard" element={<Dashboard intel={intel} advice={advice}/>}/><Route path="/intelligence" element={<Intelligence intel={intel}/>}/><Route path="/advisory" element={<Advisory advice={advice}/>}/><Route path="/doctor" element={<CropDoctor/>}/><Route path="/brics" element={<Brics models={models} schema={schema}/>}/><Route path="*" element={<Navigate to="/dashboard" replace/>}/></Routes></div></main></div>};export default App
