@@ -75,7 +75,7 @@ class BricsSchema(BaseModel):
     version: str
     fields: list[str]
 
-FARMS = {"farm-001": Farm(farm_id="farm-001", location="Nashik, Maharashtra, India", crop="Tomato", sowing_date=date(2026, 6, 15), soil_type="Loamy")}
+FARMS = {"farm-001": Farm(farm_id="farm-001", location="mumbai, Maharashtra, India", crop="Tomato", sowing_date=date(2026, 6, 15), soil_type="Loamy")}
 
 def get_farm_or_404(farm_id: str) -> Farm:
     farm = FARMS.get(farm_id)
