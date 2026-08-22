@@ -99,7 +99,7 @@ Cross-border agricultural interoperability prototype.
 The API client is at [`src/services/api.js`](src/services/api.js) and targets:
 
 ```text
-http://127.0.0.1:8000
+https://impactnexus-backend.onrender.com
 ```
 
 | Feature | Method | Endpoint |
