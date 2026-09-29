@@ -17,6 +17,7 @@ ENV/
 .env
 .env.*
 !.env.example
+backend/.cache/
 
 # ==============================
 # Jupyter Notebook
