@@ -130,4 +130,4 @@ src/
 
 ## Scope
 
-This frontend prototype does not add authentication, payments, real satellite/weather/soil providers, real ML inference, persistent data sharing, or a real BRICS network. It represents these concepts through a professional interactive interface suitable for a demo or hackathon presentation.
+Satellite, weather, and soil values are still prototype signals. Advisory and Crop Doctor call Gemini through the FastAPI backend when `GEMINI_API_KEY` is set. The UI shows that result, a cached result, or a labelled demo fallback. This frontend does not add authentication, payments, live satellite providers, or a real BRICS network.
